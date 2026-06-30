@@ -1,0 +1,49 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Academic Shield / Badge Crest Background -->
+    <path
+        android:fillColor="#15FFFFFF"
+        android:pathData="M 54,14 C 74,14 78,20 78,44 C 78,68 54,86 54,86 C 54,86 30,68 30,44 C 30,20 34,14 54,14 Z"
+        android:strokeColor="#40FFFFFF"
+        android:strokeWidth="1.5" />
+
+    <!-- Graduation Mortarboard Cap -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 54,24 L 78,33 L 54,42 L 30,33 Z" />
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M 40,38 L 40,48 C 40,54 68,54 68,48 L 68,38 Z" />
+    <!-- Cap Tassel -->
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M 54,33 L 73,40 L 73,53 C 73,55 71,56 70,54 L 69,52 Z" />
+
+    <!-- Rolled Academic Degree Scroll / Diploma -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 34,64 L 74,64 C 76.5,64 78,65.5 78,67 C 78,68.5 76.5,70 74,70 L 34,70 C 31.5,70 30,68.5 30,67 C 30,65.5 31.5,64 34,64 Z"
+        android:strokeColor="#E2E8F0"
+        android:strokeWidth="0.5" />
+    <!-- Ribbon tie -->
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M 52,63.5 L 56,63.5 L 56,70.5 L 52,70.5 Z" />
+    <!-- Ribbon tails -->
+    <path
+        android:fillColor="#DC2626"
+        android:pathData="M 53,70.5 L 51,76 L 53.5,75 L 55,76 L 54.5,70.5 Z" />
+
+    <!-- Attendance Smart Checkmark inside the crest -->
+    <path
+        android:pathData="M 46,47 L 52,53 L 64,41"
+        android:strokeColor="#10B981"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+</vector>

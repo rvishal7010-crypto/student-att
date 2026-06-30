@@ -1,0 +1,2634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartAttend - College ERP Portal</title>
+  
+  <!-- CSS CDNs -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #1e3a8a; /* Navy Blue */
+      --secondary-color: #3b82f6; /* Accent Blue */
+      --bg-light: #f8fafc; /* Light Slate background */
+      --sidebar-width: 260px;
+      --transition-speed: 0.3s;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-light);
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      background-color: var(--primary-color);
+      color: white;
+      z-index: 1030;
+      transition: all var(--transition-speed) ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar .brand {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 1rem 0;
+      margin: 0;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .sidebar-item {
+      padding: 0.25rem 1rem;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-link i {
+      font-size: 1.2rem;
+      margin-right: 1rem;
+    }
+
+    .sidebar-link:hover, .sidebar-link.active {
+      color: white;
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Main Content Wrapper */
+    .content-wrapper {
+      margin-left: var(--sidebar-width);
+      transition: all var(--transition-speed) ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar Styling */
+    .top-navbar {
+      height: 70px;
+      background-color: white;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      cursor: pointer;
+      display: none;
+    }
+
+    .user-profile-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--secondary-color);
+    }
+
+    /* Cards & Panels */
+    .stat-card {
+      background: white;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    /* Responsive tables */
+    .table-container {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .custom-table th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .custom-table td {
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* Quick status badge */
+    .status-badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-present {
+      background-color: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-absent {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Floating Dialogs */
+    .modal-content {
+      border-radius: 20px;
+      border: none;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Login Screen Layout */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      padding: 1.5rem;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    /* Media Queries */
+    @media (max-width: 991.98px) {
+      .sidebar {
+        left: calc(-1 * var(--sidebar-width));
+      }
+      .sidebar.active {
+        left: 0;
+      }
+      .content-wrapper {
+        margin-left: 0;
+      }
+      .menu-toggle {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== LOGIN CONTAINER ==================== -->
+  <div id="loginPage" class="login-container">
+    <div class="login-card p-5">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-4 p-3 mb-3" style="width: 60px; height: 60px;">
+          <i class="bi bi-mortarboard-fill fs-2"></i>
+        </div>
+        <h2 class="fw-bold text-dark mb-1">SmartAttend</h2>
+        <p class="text-muted small">College Enterprise Resource Planning</p>
+      </div>
+
+      <!-- Role Selector Tabs -->
+      <ul class="nav nav-pills nav-fill mb-4 bg-light p-1 rounded-3" id="roleTabs" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active py-2" id="admin-tab" onclick="selectRole('ADMIN')">
+            <i class="bi bi-shield-lock me-1"></i>Admin
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link py-2" id="staff-tab" onclick="selectRole('STAFF')">
+            <i class="bi bi-person-workspace me-1"></i>Staff
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link py-2" id="student-tab" onclick="selectRole('STUDENT')">
+            <i class="bi bi-person me-1"></i>Student
+          </button>
+        </li>
+      </ul>
+
+      <!-- Form -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="mb-3">
+          <label class="form-label text-muted small fw-semibold">Login ID / Username</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-person"></i></span>
+            <input type="text" id="usernameInput" class="form-control bg-light border-0 py-2.5" placeholder="Enter your portal ID" required value="staff_user">
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label text-muted small fw-semibold mb-0">Password</label>
+            <a href="#" class="text-decoration-none small text-primary">Forgot?</a>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-lock"></i></span>
+            <input type="password" id="passwordInput" class="form-control bg-light border-0 py-2.5" placeholder="Enter secure password" required value="password123">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold shadow-sm transition">
+          Access Portal <i class="bi bi-arrow-right-short ms-1 fs-5"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN PORTAL TEMPLATE ==================== -->
+  <div id="mainPortal" class="d-none">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <i class="bi bi-mortarboard-fill fs-3 text-white me-2"></i>
+        <span class="fs-5 fw-bold text-white tracking-wide">SmartAttend</span>
+      </div>
+      
+      <!-- Profile Widget inside Sidebar -->
+      <div class="px-4 py-3 border-bottom border-white-10 d-flex align-items-center gap-3">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Avatar" class="user-profile-img" id="sidebarAvatar">
+        <div>
+          <h6 class="mb-0 text-white fw-bold" id="sidebarName">Dr. Sarah Conner</h6>
+          <span class="badge bg-light text-dark small fw-medium" id="sidebarRoleLabel" style="font-size: 0.7rem;">Staff Coordinator</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="sidebar-item">
+          <a href="#" class="sidebar-link active" onclick="switchTab('dashboard')" id="nav-dashboard">
+            <i class="bi bi-grid-1x2-fill"></i>Dashboard
+          </a>
+        </li>
+        <li class="sidebar-item" id="nav-attendance-wrapper">
+          <a href="#" class="sidebar-link" onclick="switchTab('attendance')" id="nav-attendance">
+            <i class="bi bi-calendar2-check-fill"></i>Attendance
+          </a>
+        </li>
+        <li class="sidebar-item" id="nav-students-wrapper">
+          <a href="#" class="sidebar-link" onclick="switchTab('students')" id="nav-students">
+            <i class="bi bi-people-fill"></i>Students
+          </a>
+        </li>
+        <li class="sidebar-item" id="nav-staff-wrapper">
+          <a href="#" class="sidebar-link" onclick="switchTab('staff')" id="nav-staff">
+            <i class="bi bi-person-vcard-fill"></i>Staff List
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#" class="sidebar-link" onclick="switchTab('reports')" id="nav-reports">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i>Reports
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#" class="sidebar-link" onclick="switchTab('charts')" id="nav-charts">
+            <i class="bi bi-pie-chart-fill"></i>Analytics
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#" class="sidebar-link" onclick="switchTab('ai-portal')" id="nav-ai-portal">
+            <i class="bi bi-cpu-fill"></i>AI Intelligence
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="#" class="sidebar-link" onclick="switchTab('profile')" id="nav-profile">
+            <i class="bi bi-person-fill-gear"></i>My Profile
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div>SmartAttend ERP v2.4</div>
+        <div class="small opacity-50">CSE Department</div>
+      </div>
+    </aside>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+      
+      <!-- Top Navbar -->
+      <header class="top-navbar">
+        <div class="d-flex align-items-center">
+          <button class="menu-toggle me-3" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="d-none d-md-flex align-items-center gap-2 text-muted small">
+            <i class="bi bi-calendar3"></i>
+            <span id="currentDateString">Monday, June 29, 2026</span>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Notification Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-light position-relative rounded-circle p-2" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-bell"></i>
+              <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="width: 280px; border-radius: 12px;">
+              <li class="px-3 py-2 fw-semibold border-bottom">Notifications</li>
+              <li><a class="dropdown-item py-2 border-bottom" href="#"><span class="fw-medium small d-block">Dr. John Doe marked CSE-801</span><span class="text-muted" style="font-size: 0.75rem;">10 mins ago</span></a></li>
+              <li><a class="dropdown-item py-2 border-bottom" href="#"><span class="fw-medium small d-block">3 Students attendance low <75%</span><span class="text-muted" style="font-size: 0.75rem;">1 hour ago</span></a></li>
+              <li class="text-center py-2"><a href="#" class="small text-primary text-decoration-none">View All</a></li>
+            </ul>
+          </div>
+
+          <!-- Quick User Dropdown -->
+          <div class="dropdown">
+            <div class="d-flex align-items-center gap-2 cursor-pointer" data-bs-toggle="dropdown" style="cursor: pointer;">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="User" class="user-profile-img" id="navAvatar">
+              <span class="d-none d-lg-inline fw-medium text-dark" id="navName">Dr. Sarah Conner</span>
+              <i class="bi bi-chevron-down text-muted small"></i>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px;">
+              <li><a class="dropdown-item" href="#" onclick="switchTab('profile')"><i class="bi bi-person me-2"></i>My Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Container Pages -->
+      <main class="container-fluid p-4 flex-grow-1">
+
+        <!-- ==================== PAGE: ADMIN DASHBOARD ==================== -->
+        <div id="page-admin-dashboard" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">Administrative Terminal</h3>
+              <p class="text-muted">High-level insights & ERP administration for CSE department.</p>
+            </div>
+            <button class="btn btn-primary btn-sm rounded-3 py-2 px-3 shadow-sm" onclick="switchTab('students')">
+              <i class="bi bi-person-plus me-1"></i> Register Student
+            </button>
+          </div>
+
+          <!-- Status Grid -->
+          <div class="row g-4 mb-4">
+            <div class="col-12 col-sm-6 col-xl-3">
+              <div class="card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-semibold">TOTAL REGISTERED</span>
+                    <h3 class="fw-bold text-dark mt-1" id="admin-total-students">120</h3>
+                    <span class="text-success small fw-medium"><i class="bi bi-arrow-up-short"></i> +6 New this term</span>
+                  </div>
+                  <div class="card-icon bg-primary text-white">
+                    <i class="bi bi-people-fill"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+              <div class="card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-semibold">FACULTY MEMBERS</span>
+                    <h3 class="fw-bold text-dark mt-1" id="admin-total-staff">12</h3>
+                    <span class="text-muted small">8 Active today</span>
+                  </div>
+                  <div class="card-icon bg-info text-white">
+                    <i class="bi bi-person-workspace"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+              <div class="card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-semibold">AVG ATTENDANCE</span>
+                    <h3 class="fw-bold text-dark mt-1">92.4%</h3>
+                    <span class="text-danger small fw-medium"><i class="bi bi-arrow-down-short"></i> -1.2% Low climate</span>
+                  </div>
+                  <div class="card-icon bg-success text-white">
+                    <i class="bi bi-graph-up-arrow"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-3">
+              <div class="card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-semibold">ACTIVE BATCHES</span>
+                    <h3 class="fw-bold text-dark mt-1">4</h3>
+                    <span class="text-primary small fw-medium">Regular Curricular</span>
+                  </div>
+                  <div class="card-icon bg-warning text-white">
+                    <i class="bi bi-journal-check"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Extra Admin panels -->
+          <div class="row g-4">
+            <div class="col-12 col-xl-8">
+              <div class="table-container mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold text-dark mb-0"><i class="bi bi-activity text-primary me-2"></i>Recent Activity Feed</h5>
+                  <span class="badge bg-primary">Live</span>
+                </div>
+                <div class="list-group list-group-flush">
+                  <div class="list-group-item px-0 py-3 d-flex align-items-center gap-3">
+                    <span class="btn btn-light-success rounded-circle p-2"><i class="bi bi-check-circle-fill text-success"></i></span>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-semibold">Attendance submitted for Java Dev</h6>
+                      <p class="text-muted small mb-0">By Dr. Sarah Conner • 56 Students accounted for</p>
+                    </div>
+                    <span class="text-muted small">09:45 AM</span>
+                  </div>
+                  <div class="list-group-item px-0 py-3 d-flex align-items-center gap-3">
+                    <span class="btn btn-light-primary rounded-circle p-2"><i class="bi bi-person-plus-fill text-primary"></i></span>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-semibold">New Student Profile Registered</h6>
+                      <p class="text-muted small mb-0">Marcus Brown (Roll: CSE-2026-006) was added to Database</p>
+                    </div>
+                    <span class="text-muted small">Yesterday</span>
+                  </div>
+                  <div class="list-group-item px-0 py-3 d-flex align-items-center gap-3">
+                    <span class="btn btn-light-warning rounded-circle p-2"><i class="bi bi-file-earmark-text-fill text-warning"></i></span>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0 fw-semibold">Gemini Intervention Report Drafted</h6>
+                      <p class="text-muted small mb-0">Automated performance distribution summary was produced</p>
+                    </div>
+                    <span class="text-muted small">2 days ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-12 col-xl-4">
+              <div class="table-container mb-4">
+                <h5 class="fw-bold text-dark mb-3">Department Quick Tools</h5>
+                <div class="d-grid gap-3">
+                  <button class="btn btn-outline-primary text-start p-3 rounded-3" onclick="switchTab('reports')">
+                    <i class="bi bi-robot me-2 fs-5"></i>
+                    <strong>Automated AI Analysis</strong>
+                    <div class="small text-muted mt-1">Initiate generative analytics review</div>
+                  </button>
+                  <button class="btn btn-outline-success text-start p-3 rounded-3" onclick="switchTab('staff')">
+                    <i class="bi bi-person-vcard me-2 fs-5"></i>
+                    <strong>Faculty Registry</strong>
+                    <div class="small text-muted mt-1">Manage active lectures & classes</div>
+                  </button>
+                  <button class="btn btn-outline-warning text-start p-3 rounded-3" onclick="switchTab('charts')">
+                    <i class="bi bi-pie-chart-fill me-2 fs-5"></i>
+                    <strong>Visual Charts Terminal</strong>
+                    <div class="small text-muted mt-1">Export analytical reports</div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: STAFF DASHBOARD ==================== -->
+        <div id="page-staff-dashboard" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">Lecturer Desk</h3>
+              <p class="text-muted">Manage scheduled sessions, student records, and evaluate marks.</p>
+            </div>
+            <button class="btn btn-primary py-2 px-3 rounded-3 shadow-sm" onclick="switchTab('attendance')">
+              <i class="bi bi-check2-all me-1"></i> Mark Attendance Now
+            </button>
+          </div>
+
+          <!-- Staff Stats -->
+          <div class="row g-4 mb-4">
+            <div class="col-12 col-md-4">
+              <div class="card stat-card p-4 bg-primary text-white">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-white-50 small fw-semibold">TODAY'S CLASS AVG</span>
+                    <h2 class="fw-bold mt-1">94.2%</h2>
+                    <span class="text-white-50 small">Optimal high-performance</span>
+                  </div>
+                  <div class="btn btn-light-primary text-white bg-white-20 p-3 rounded-circle">
+                    <i class="bi bi-award-fill fs-3 text-white"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-semibold">CLASSES REMAINING</span>
+                    <h2 class="fw-bold text-dark mt-1">1 / 3</h2>
+                    <span class="text-success small fw-medium">CSE-801 Completed</span>
+                  </div>
+                  <div class="card-icon bg-info text-white">
+                    <i class="bi bi-clock-history"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="card stat-card p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <span class="text-muted small fw-semibold">FLAGGED FOR RISK</span>
+                    <h2 class="fw-bold text-danger mt-1">2 Students</h2>
+                    <span class="text-muted small">Attendance below 75% limit</span>
+                  </div>
+                  <div class="card-icon bg-danger text-white">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Lectures list -->
+          <div class="table-container mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-event me-2 text-primary"></i>Lecturer Active Class Sessions</h5>
+            <div class="table-responsive">
+              <table class="table custom-table align-middle">
+                <thead>
+                  <tr>
+                    <th>Subject Name</th>
+                    <th>Subject Code</th>
+                    <th>Room</th>
+                    <th>Timings</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-dashboard-sessions">
+                  <!-- Generated with JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: STUDENT DASHBOARD ==================== -->
+        <div id="page-student-dashboard" class="dashboard-page d-none">
+          <div class="row g-4 mb-4">
+            <div class="col-12 col-lg-8">
+              <!-- Personalized Welcome -->
+              <div class="card border-0 p-4 mb-4 text-white rounded-4" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold fs-3" style="width: 60px; height: 60px;">
+                    JD
+                  </div>
+                  <div>
+                    <h4 class="fw-bold mb-1">Welcome, John Doe</h4>
+                    <p class="mb-0 text-white-50 small">Roll No: CSE-2026-001 • Semester 8 • B.Tech CSE</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Student Academic Cards -->
+              <div class="row g-4">
+                <div class="col-12 col-md-6">
+                  <div class="table-container">
+                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-check2-circle me-1 text-success"></i>Semester Aggregate Attendance</h6>
+                    <h2 class="fw-bold text-primary mb-1">95.6%</h2>
+                    <p class="text-muted small">Overall classroom record. You are in excellent standing.</p>
+                    <div class="progress rounded-pill mt-3" style="height: 10px;">
+                      <div class="progress-bar bg-success" style="width: 95.6%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="table-container">
+                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-star-fill me-1 text-warning"></i>Internal Marks Estimator</h6>
+                    <h2 class="fw-bold text-dark mb-1">91 / 100</h2>
+                    <p class="text-muted small">Computed subject-wise mark aggregate including class assignments.</p>
+                    <div class="progress rounded-pill mt-3" style="height: 10px;">
+                      <div class="progress-bar bg-primary" style="width: 91%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Internal Marks Statement table -->
+              <div class="table-container mt-4">
+                <h5 class="fw-bold text-dark mb-3">Academic Internals Score Statement</h5>
+                <div class="table-responsive">
+                  <table class="table custom-table">
+                    <thead>
+                      <tr>
+                        <th>Subject Code</th>
+                        <th>Test 1 (30)</th>
+                        <th>Test 2 (30)</th>
+                        <th>Assignment (10)</th>
+                        <th>Attendance (30)</th>
+                        <th>Cumulative Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="fw-semibold text-primary">CSE-801</td>
+                        <td>26</td>
+                        <td>25</td>
+                        <td>9</td>
+                        <td>28</td>
+                        <td class="fw-bold text-dark">88 / 100</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-semibold text-primary">CSE-802</td>
+                        <td>28</td>
+                        <td>29</td>
+                        <td>10</td>
+                        <td>30</td>
+                        <td class="fw-bold text-dark">97 / 100</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Student Sidebar Alerts -->
+            <div class="col-12 col-lg-4">
+              <div class="table-container">
+                <h5 class="fw-bold text-dark mb-3">Department Feed & Alerts</h5>
+                <div class="d-flex flex-column gap-3">
+                  <div class="p-3 bg-light rounded-3 border-start border-primary border-4">
+                    <h6 class="fw-semibold mb-1 small">Upcoming End Term Exams</h6>
+                    <p class="text-muted small mb-0">Theory examinations are set to commence from July 15, 2026.</p>
+                  </div>
+                  <div class="p-3 bg-light rounded-3 border-start border-success border-4">
+                    <h6 class="fw-semibold mb-1 small">Full Attendance Reward</h6>
+                    <p class="text-muted small mb-0">Students maintaining >=95% are awarded full 30 internal points.</p>
+                  </div>
+                  <div class="p-3 bg-light rounded-3 border-start border-danger border-4">
+                    <h6 class="fw-semibold mb-1 small">Intervention Notice</h6>
+                    <p class="text-muted small mb-0">Flagged students (Attendance < 75%) must report to coordinators.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: ATTENDANCE MANAGEMENT ==================== -->
+        <div id="page-attendance" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">Class Attendance Desk</h3>
+              <p class="text-muted">Select scheduled academic slot and register daily records.</p>
+            </div>
+          </div>
+
+          <!-- Selection Controls -->
+          <div class="table-container mb-4">
+            <h5 class="fw-bold text-dark mb-3">Configure Active Attendance Slot</h5>
+            <div class="row g-3">
+              <div class="col-12 col-md-3">
+                <label class="form-label small text-muted">Subject Code</label>
+                <select class="form-select bg-light border-0" id="attendanceSubjectSelect">
+                  <option value="CSE-801">Java Full Stack Dev (CSE-801)</option>
+                  <option value="CSE-802">Machine Learning (CSE-802)</option>
+                  <option value="CSE-803">Cloud Computing (CSE-803)</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label small text-muted">Active Room Location</label>
+                <select class="form-select bg-light border-0" id="attendanceRoomSelect">
+                  <option value="Lab Room 12B">Lab Room 12B</option>
+                  <option value="Lecture Hall A">Lecture Hall A</option>
+                  <option value="Seminar Room 3">Seminar Room 3</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label small text-muted">Academic Date</label>
+                <input type="date" class="form-control bg-light border-0" id="attendanceDateSelect" value="2026-06-29">
+              </div>
+              <div class="col-12 col-md-3 d-flex align-items-end">
+                <button class="btn btn-primary w-100 py-2 rounded-3 fw-bold" onclick="startLoadingAttendanceList()">
+                  <i class="bi bi-arrow-right-circle me-1"></i> Retrieve Students
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Marking Table (Shown once active slot loaded) -->
+          <div class="table-container d-none" id="attendanceListSection">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold text-dark mb-0"><i class="bi bi-list-task text-primary me-2"></i>Mark Attendance Checklist</h5>
+              <div class="btn-group gap-2">
+                <button class="btn btn-outline-success btn-sm rounded-3" onclick="setAllAttendance(true)">
+                  Present All
+                </button>
+                <button class="btn btn-outline-danger btn-sm rounded-3" onclick="setAllAttendance(false)">
+                  Absent All
+                </button>
+              </div>
+            </div>
+            
+            <div class="table-responsive mb-4">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Department</th>
+                    <th>Status Action</th>
+                  </tr>
+                </thead>
+                <tbody id="attendance-marking-rows">
+                  <!-- Generated dynamically with JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3">
+              <button class="btn btn-light rounded-3 px-4 py-2" onclick="cancelMarking()">Cancel</button>
+              <button class="btn btn-primary rounded-3 px-4 py-2 fw-semibold" onclick="submitActiveAttendance()">Submit Registry</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: STUDENT MANAGEMENT ==================== -->
+        <div id="page-students" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">Student Registry Manager</h3>
+              <p class="text-muted">Register, edit, and keep tracking of classroom student details.</p>
+            </div>
+            <button class="btn btn-primary py-2 px-3 rounded-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+              <i class="bi bi-plus-lg me-1"></i> Register Student
+            </button>
+          </div>
+
+          <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold text-dark mb-0"><i class="bi bi-people-fill text-primary me-2"></i>Active Student Database</h5>
+              <div style="max-width: 250px; width: 100%;">
+                <input type="text" class="form-control form-control-sm rounded-3 bg-light border-0 py-2 px-3" placeholder="Search roll, name..." id="studentSearchInput" oninput="filterStudentsTable()">
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Profile Name</th>
+                    <th>Roll Number</th>
+                    <th>Dept</th>
+                    <th>Semester</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                  <!-- Generated with JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: STAFF MANAGEMENT ==================== -->
+        <div id="page-staff" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">Academic Faculty Portal</h3>
+              <p class="text-muted">Department lecturer and staff configuration desk.</p>
+            </div>
+            <button class="btn btn-primary py-2 px-3 rounded-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+              <i class="bi bi-plus-lg me-1"></i> Register Lecturer
+            </button>
+          </div>
+
+          <div class="table-container">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-shield-lock-fill text-primary me-2"></i>Faculty Access List</h5>
+            <div class="table-responsive">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Faculty Member</th>
+                    <th>Designation</th>
+                    <th>Department</th>
+                    <th>Assigned Subject</th>
+                  </tr>
+                </thead>
+                <tbody id="staffTableBody">
+                  <!-- Generated with JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: REPORTS PAGE ==================== -->
+        <div id="page-reports" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">Automated Report Generator</h3>
+              <p class="text-muted">Draft smart student attendance review drafts instantly with Gemini AI.</p>
+            </div>
+          </div>
+
+          <!-- Interactive prompt panel -->
+          <div class="card border-0 p-4 mb-4 text-white rounded-4 shadow-sm" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);">
+            <div class="row align-items-center">
+              <div class="col-lg-8">
+                <h5 class="fw-bold mb-2"><i class="bi bi-robot me-2"></i>Generative AI Intervention Engine</h5>
+                <p class="mb-0 text-white-50 small">Deploying Gemini models evaluates recent classroom attendance trends, compiles list of low-performing candidates, and suggests critical actionable counselor steps.</p>
+              </div>
+              <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <button class="btn btn-light text-primary fw-bold px-4 py-2.5 rounded-3" onclick="triggerAiReport()">
+                  Generate with Gemini
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div class="table-container d-none text-center p-5" id="aiReportLoading">
+            <div class="spinner-border text-primary mb-3" role="status"></div>
+            <h5>Gemini model is running analytics, please hold on...</h5>
+          </div>
+
+          <!-- Generated Report Showcase -->
+          <div class="table-container d-none mb-4" id="aiReportShowcase">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark mb-0"><i class="bi bi-file-text-fill text-primary me-2"></i>Gemini Analysis Draft Report</h5>
+              <button class="btn btn-outline-primary btn-sm rounded-3" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i> Print Draft
+              </button>
+            </div>
+            <div class="p-4 bg-light rounded-3" style="border: 1px dashed var(--secondary-color);">
+              <pre class="mb-0" id="aiReportTextContainer" style="white-space: pre-wrap; font-family: 'Inter', sans-serif; font-size: 0.95rem; line-height: 1.6;"></pre>
+            </div>
+          </div>
+
+          <!-- Base table statistics reports -->
+          <div class="table-container">
+            <h5 class="fw-bold text-dark mb-3">Subject Wise Active Performance Aggregate</h5>
+            <div class="table-responsive">
+              <table class="table custom-table">
+                <thead>
+                  <tr>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Classes Held</th>
+                    <th>Overall Attendance</th>
+                    <th>Flagged At-Risk</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="fw-semibold text-primary">CSE-801</td>
+                    <td>Java Full Stack Dev</td>
+                    <td>14</td>
+                    <td class="text-success fw-bold">94.2%</td>
+                    <td>0 Students</td>
+                  </tr>
+                  <tr>
+                    <td class="fw-semibold text-primary">CSE-802</td>
+                    <td>Machine Learning</td>
+                    <td>12</td>
+                    <td class="text-warning fw-bold">78.5%</td>
+                    <td>2 Students</td>
+                  </tr>
+                  <tr>
+                    <td class="fw-semibold text-primary">CSE-803</td>
+                    <td>Cloud Computing</td>
+                    <td>10</td>
+                    <td class="text-success fw-bold">91.8%</td>
+                    <td>1 Student</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: CHARTS PAGE ==================== -->
+        <div id="page-charts" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">Visual Analytics Dashboard</h3>
+              <p class="text-muted">Graphical analysis representing monthly and subject-wise aggregate attendance patterns.</p>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-12 col-xl-6">
+              <div class="table-container mb-4">
+                <h5 class="fw-bold text-dark mb-3">Weekly Attendance Trends Over Time</h5>
+                <div style="height: 320px;">
+                  <canvas id="weeklyTrendsChart"></canvas>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-12 col-xl-6">
+              <div class="table-container mb-4">
+                <h5 class="fw-bold text-dark mb-3">Subject Wise Class Comparison</h5>
+                <div style="height: 320px;">
+                  <canvas id="subjectComparisonChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: PROFILE PAGE ==================== -->
+        <div id="page-profile" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">User Settings & Profile</h3>
+              <p class="text-muted">Edit profile details, manage access settings and modify details.</p>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-12 col-lg-4">
+              <div class="table-container text-center p-4">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Avatar" class="rounded-circle mb-3 border border-4 border-primary" style="width: 120px; height: 120px; object-fit: cover;" id="profileCardAvatar">
+                <h5 class="fw-bold text-dark mb-1" id="profileCardName">Dr. Sarah Conner</h5>
+                <p class="text-muted small" id="profileCardRole">Senior Lecturer • CSE Department</p>
+                <span class="badge bg-primary px-3 py-2 rounded-pill small">Active Status</span>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-8">
+              <div class="table-container">
+                <h5 class="fw-bold text-dark mb-4">Edit Profile Metadata</h5>
+                <form id="profileForm" onsubmit="saveProfileChanges(event)">
+                  <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-6">
+                      <label class="form-label text-muted small fw-semibold">Display Full Name</label>
+                      <input type="text" class="form-control bg-light border-0" id="profileInputName" value="Dr. Sarah Conner" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label text-muted small fw-semibold">Designation Title</label>
+                      <input type="text" class="form-control bg-light border-0" id="profileInputDesignation" value="Senior Lecturer" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label text-muted small fw-semibold">Department Division</label>
+                      <input type="text" class="form-control bg-light border-0" value="Computer Science Engineering" disabled>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label text-muted small fw-semibold">Portal Username/ID</label>
+                      <input type="text" class="form-control bg-light border-0" value="sarah_conner_cse" disabled>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary rounded-3 px-4 py-2 fw-semibold">Save Profile Changes</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PAGE: AI INTELLIGENCE PORTAL ==================== -->
+        <div id="page-ai-portal" class="dashboard-page d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="fw-bold text-dark mb-1">AI Intelligence Portal</h3>
+              <p class="text-muted">Predictive analytics, grade forecasting, risk alert monitoring and smart conversational chatbot assistants.</p>
+            </div>
+            <span class="badge bg-primary px-3 py-2 rounded-3 fs-6"><i class="bi bi-robot me-1 animate-pulse"></i> Gemini AI Enabled</span>
+          </div>
+
+          <div class="row g-4">
+            <!-- Left Side: Interactive Predictions & Simulation Alerts -->
+            <div class="col-12 col-xl-7">
+              
+              <!-- Card: Student Selector and Basic Parameters -->
+              <div class="table-container mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                  <h5 class="fw-bold text-dark mb-0"><i class="bi bi-sliders text-primary me-2"></i>Target Student Profile</h5>
+                  <span class="text-muted small">Update settings to recalculate predictions</span>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label text-muted small fw-semibold">Select Student</label>
+                    <select class="form-select bg-light border-0 py-2.5" id="aiStudentSelector" onchange="loadSelectedStudentAiData()">
+                      <!-- Will be populated dynamically -->
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-muted small fw-semibold">Current Attendance Aggregate</label>
+                    <input type="text" class="form-control bg-light border-0 py-2.5" id="aiCurrentAttendance" readonly value="95.6%">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Attendance Shortage & Trend Forecaster -->
+              <div class="table-container mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-graph-up-arrow text-primary me-2"></i>📊 Attendance Projection Engine & Shortage Forecast</h5>
+                
+                <div class="p-3 bg-light rounded-3 mb-4">
+                  <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                      <span class="text-muted small fw-semibold">PREDICTED END-OF-TERM ATTENDANCE</span>
+                      <h1 class="fw-bold text-primary display-5 my-1" id="aiPredictedAttendance">95.6%</h1>
+                      <p class="text-muted mb-0 small" id="aiAttendanceStandingText">Safely above standard compliance thresholds</p>
+                    </div>
+                    <div class="col-md-6">
+                      <!-- Status Banner (Dynamic) -->
+                      <div class="card p-3 border-0 text-white rounded-3 shadow-sm" id="aiAlertStatusCard" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <div class="d-flex align-items-start gap-3">
+                          <div class="bg-white text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="bi bi-shield-check fs-5" id="aiAlertStatusIcon"></i>
+                          </div>
+                          <div>
+                            <h6 class="fw-bold mb-1" id="aiAlertStatusTitle">Excellent Standing</h6>
+                            <p class="small mb-0" id="aiAlertStatusDesc">Attendance prediction is comfortably in good standing. No shortage risk detected.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Simulation Slider: Future Missed Classes -->
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between mb-2">
+                    <label class="form-label text-dark fw-medium mb-0"><i class="bi bi-clock-history me-1 text-secondary"></i>Simulate Future Absences (Missed Classes)</label>
+                    <span class="fw-bold text-primary" id="sliderValueText">0 classes</span>
+                  </div>
+                  <input type="range" class="form-range" min="0" max="15" value="0" id="aiAbsenceSimulatorSlider" oninput="runAttendanceSimulation()">
+                  <div class="d-flex justify-content-between text-muted small mt-1">
+                    <span>0 classes missed (Current)</span>
+                    <span>15 classes missed (Max)</span>
+                  </div>
+                </div>
+
+                <!-- Automatic Email Trigger Alert -->
+                <div class="d-none" id="aiEmailAlertContainer">
+                  <div class="d-flex align-items-center justify-content-between p-3 border border-warning rounded-3 bg-warning-subtle">
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="bi bi-envelope-exclamation-fill text-warning fs-4"></i>
+                      <div>
+                        <h6 class="fw-bold text-dark mb-0 text-warning-emphasis">Automatic Shortage Trigger Warning</h6>
+                        <p class="small text-muted mb-0">Predicted shortage alert ready for parent/student dispatch.</p>
+                      </div>
+                    </div>
+                    <button class="btn btn-warning btn-sm fw-bold px-3 py-2 rounded-3 text-dark" onclick="sendSimulatedLowAttendanceEmail()">
+                      <i class="bi bi-envelope-paper-fill me-1"></i> Send Email Warning Alert
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Performance & Grade Prediction -->
+              <div class="table-container mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-star-fill text-warning me-2"></i>📈 Student Performance & Final Grade Predictor</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3 text-center border">
+                      <span class="text-muted small fw-semibold">PREDICTED GRADE PREDICTION</span>
+                      <h1 class="fw-bold text-success display-4 my-2" id="aiPredictedGrade">A+</h1>
+                      <span class="badge bg-success-subtle text-success border border-success px-3 py-1.5 rounded-pill fw-bold" id="aiPredictedGradeStatus">EXCELLENT</span>
+                    </div>
+                  </div>
+                  <div class="col-md-6 d-flex flex-column justify-content-center">
+                    <div class="mb-2">
+                      <span class="text-muted small fw-semibold d-block">AGGREGATE RATINGS METRIC:</span>
+                      <div class="progress rounded-pill mt-1" style="height: 12px;">
+                        <div class="progress-bar bg-success" id="aiPerformanceProgressBar" style="width: 95.6%"></div>
+                      </div>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2" id="aiPerformanceFeedbackText">John is tracking at the highest standard. Strong theoretical mastery (Tests: 51/60) and flawless class records indicate high likelihood of securing university ranking.</p>
+                  </div>
+                </div>
+
+                <!-- Interactive inputs for performance simulation -->
+                <div class="row g-3 mt-3 pt-3 border-top">
+                  <div class="col-sm-6">
+                    <div class="d-flex justify-content-between mb-1">
+                      <label class="form-label text-muted small mb-0">CIA Continuous Assessment Scores</label>
+                      <span class="small fw-bold text-dark" id="aiCiaText">51 / 60</span>
+                    </div>
+                    <input type="range" class="form-range" min="0" max="60" value="51" id="aiCiaSimulatorSlider" oninput="runPerformanceSimulation()">
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="d-flex justify-content-between mb-1">
+                      <label class="form-label text-muted small mb-0">Lab / Assignment Score</label>
+                      <span class="small fw-bold text-dark" id="aiLabText">9 / 10</span>
+                    </div>
+                    <input type="range" class="form-range" min="0" max="10" value="9" id="aiLabSimulatorSlider" oninput="runPerformanceSimulation()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Graduation Degree & Honors Forecast (Degree Image with Custom App Logo) -->
+              <div class="table-container mb-4" id="aiDegreeCertificateCard">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-award-fill text-primary me-2"></i>🎓 SmartAttend Honors Degree Certificate Forecast</h5>
+                
+                <div class="p-4 rounded-3 border border-2 border-warning-subtle text-center position-relative overflow-hidden" style="background: radial-gradient(circle, #ffffff 60%, #fffbeb 100%);">
+                  
+                  <!-- Golden Seal Watermark Background -->
+                  <div class="position-absolute opacity-10" style="right: -20px; bottom: -20px; pointer-events: none;">
+                    <i class="bi bi-award-fill text-warning" style="font-size: 15rem;"></i>
+                  </div>
+                  
+                  <!-- Certificate Border -->
+                  <div class="border border-warning p-4 rounded-2" style="border-style: double !important; border-width: 3px !important; position: relative; z-index: 2;">
+                    
+                    <!-- Crest / App Logo Design in Degree Image -->
+                    <div class="mb-3 d-flex justify-content-center">
+                      <div class="bg-light p-2 rounded-circle shadow-sm" style="border: 2px solid #fbbf24; background: #fff !important;">
+                        <!-- Embed SVG App Logo Design representing Academic Degree -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" style="width: 80px; height: 80px;">
+                          <!-- Shield Background -->
+                          <path d="M 54,14 C 74,14 78,20 78,44 C 78,68 54,86 54,86 C 54,86 30,68 30,44 C 30,20 34,14 54,14 Z" fill="rgba(30, 27, 75, 0.05)" stroke="#1e1b4b" stroke-width="1.5" />
+                          <!-- Graduation Mortarboard Cap -->
+                          <path d="M 54,24 L 78,33 L 54,42 L 30,33 Z" fill="#1e1b4b" />
+                          <path d="M 40,38 L 40,48 C 40,54 68,54 68,48 L 68,38 Z" fill="#4f46e5" />
+                          <path d="M 54,33 L 73,40 L 73,53 C 73,55 71,56 70,54 L 69,52 Z" fill="#fbbf24" />
+                          <!-- Rolled Degree Scroll / Diploma -->
+                          <path d="M 34,64 L 74,64 C 76.5,64 78,65.5 78,67 C 78,68.5 76.5,70 74,70 L 34,70 C 31.5,70 30,68.5 30,67 C 30,65.5 31.5,64 34,64 Z" fill="#ffffff" stroke="#1e1b4b" stroke-width="0.75" />
+                          <path d="M 52,63.5 L 56,63.5 L 56,70.5 L 52,70.5 Z" fill="#ef4444" />
+                          <path d="M 53,70.5 L 51,76 L 53.5,75 L 55,76 L 54.5,70.5 Z" fill="#dc2626" />
+                          <!-- Smart Checkmark -->
+                          <path d="M 46,47 L 52,53 L 64,41" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <span class="text-uppercase tracking-wider small text-muted d-block mb-1" style="font-size: 0.75rem; letter-spacing: 2px;">SmartAttend Academic Council</span>
+                    <h4 class="fw-serif text-dark mb-3" style="font-family: Georgia, serif; font-weight: bold;">PROVISIONAL DEGREE CERTIFICATE FORECAST</h4>
+                    
+                    <p class="text-muted small mb-1">This is to certify that the student</p>
+                    <h5 class="fw-bold text-primary mb-2" id="aiCertificateStudentName">John Doe</h5>
+                    
+                    <p class="text-muted small mb-2">is predicted to successfully qualify for the degree of</p>
+                    <h6 class="fw-bold text-dark mb-2">Bachelor of Science in Computer Science & Engineering</h6>
+                    
+                    <p class="text-muted small mb-1">with current terminal standing performance predicted at</p>
+                    <div class="mb-3">
+                      <span class="badge bg-success-subtle text-success border border-success px-4 py-2 rounded-pill fw-bold fs-6" id="aiCertificateGrade">CLASS FIRST DIVISION (A+)</span>
+                    </div>
+
+                    <div class="row mt-4 pt-3 border-top border-warning-subtle text-start">
+                      <div class="col-6 text-center">
+                        <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.2rem; color: #1e1b4b;" id="aiCertificateDeanSig">SmartDean AI</div>
+                        <span class="text-muted d-block border-top pt-1 mt-1" style="font-size: 0.65rem;">DEAN OF ACADEMIC AFFAIRS</span>
+                      </div>
+                      <div class="col-6 text-center">
+                        <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.2rem; color: #1e1b4b;" id="aiCertificateSarahSig">Sarah Conner</div>
+                        <span class="text-muted d-block border-top pt-1 mt-1" style="font-size: 0.65rem;">COORDINATOR CSE</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Side: Gemini AI Assistant Chatbot -->
+            <div class="col-12 col-xl-5">
+              <div class="table-container p-0 d-flex flex-column bg-white shadow-sm overflow-hidden" style="height: 645px; border-radius: 20px;">
+                <!-- Chat Header -->
+                <div class="p-3 border-bottom d-flex align-items-center gap-3 bg-primary text-white">
+                  <div class="bg-white text-primary rounded-circle p-2.5 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                    <i class="bi bi-robot fs-4 animate-bounce"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0 text-white">SmartAttend Student Counselor</h6>
+                    <span class="small text-white-50"><i class="bi bi-circle-fill text-success small me-1"></i> Live Gemini AI Model Assistant</span>
+                  </div>
+                </div>
+
+                <!-- Chat Messages Container -->
+                <div class="flex-grow-1 p-3 overflow-y-auto bg-light" id="aiChatboxMessages" style="height: 480px;">
+                  
+                  <!-- Assistant Message -->
+                  <div class="d-flex align-items-start gap-2 mb-3">
+                    <div class="bg-primary text-white rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                      <i class="bi bi-robot small"></i>
+                    </div>
+                    <div class="p-3 rounded-4 bg-white text-dark shadow-sm max-w-85" style="border-top-left-radius: 0;">
+                      <p class="mb-0 small">Hello! I am your <strong>SmartAttend Academic Counselor</strong>, powered by Gemini.</p>
+                      <p class="mb-0 mt-2 small">I can help you analyze your current attendance standing, forecast terminal exam eligibility, calculate required presence scores, or explain college regulations.</p>
+                      <p class="mb-0 mt-2 small"><strong>Ask me anything like:</strong></p>
+                      <div class="d-flex flex-wrap gap-1 mt-2">
+                        <button class="btn btn-outline-primary btn-xs py-1 px-2 rounded-pill" style="font-size: 0.75rem;" onclick="insertQuickChatQuery('How to improve my attendance aggregate?')">How to improve attendance?</button>
+                        <button class="btn btn-outline-primary btn-xs py-1 px-2 rounded-pill" style="font-size: 0.75rem;" onclick="insertQuickChatQuery('What happens if attendance is below 75%?')">Shortage rules?</button>
+                        <button class="btn btn-outline-primary btn-xs py-1 px-2 rounded-pill" style="font-size: 0.75rem;" onclick="insertQuickChatQuery('Predict my grade based on current assessments')">Predict grade?</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Chat Input area -->
+                <div class="p-3 bg-white border-top">
+                  <form id="aiChatForm" onsubmit="handleSendAiChatMessage(event)">
+                    <div class="input-group">
+                      <input type="text" class="form-control bg-light border-0 py-2.5" id="aiChatInputField" placeholder="Ask Gemini Counselor..." required autocomplete="off">
+                      <button class="btn btn-primary px-3 rounded-end-3" type="submit" id="aiChatSendBtn">
+                        <i class="bi bi-send-fill"></i>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODALS SECTION ==================== -->
+  
+  <!-- Modal: Add Student -->
+  <div class="modal fade" id="addStudentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold text-dark" id="addStudentModalLabel"><i class="bi bi-person-plus-fill text-primary me-2"></i>Register New Student</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleRegisterStudent(event)">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label text-muted small">Full Name</label>
+              <input type="text" class="form-control bg-light border-0 py-2.5" id="addStudentName" placeholder="Enter complete name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">Roll Number</label>
+              <input type="text" class="form-control bg-light border-0 py-2.5" id="addStudentRoll" placeholder="CSE-2026-XXX" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">Department</label>
+              <input type="text" class="form-control bg-light border-0 py-2.5" value="CSE" disabled id="addStudentDept">
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">Semester</label>
+              <select class="form-select bg-light border-0 py-2.5" id="addStudentSem">
+                <option value="Sem 8">Sem 8</option>
+                <option value="Sem 7">Sem 7</option>
+                <option value="Sem 6">Sem 6</option>
+                <option value="Sem 5">Sem 5</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4 fw-semibold">Register Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Staff -->
+  <div class="modal fade" id="addStaffModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-vcard-fill text-primary me-2"></i>Register New Faculty</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="handleRegisterStaff(event)">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label text-muted small">Full Name</label>
+              <input type="text" class="form-control bg-light border-0 py-2.5" id="addStaffName" placeholder="Enter complete name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">Designation Designation</label>
+              <input type="text" class="form-control bg-light border-0 py-2.5" id="addStaffRole" placeholder="e.g. Professor, Assistant Prof" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">Department</label>
+              <input type="text" class="form-control bg-light border-0 py-2.5" value="CSE" disabled id="addStaffDept">
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">Assigned Subject</label>
+              <input type="text" class="form-control bg-light border-0 py-2.5" id="addStaffSubject" placeholder="e.g. Database Systems" required>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4 fw-semibold">Register Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Predict Success -->
+  <div class="modal fade" id="predictSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content p-3" style="border-radius: 16px;">
+        <div class="modal-header border-0 pb-0">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-primary text-white rounded-circle p-2.5 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+              <i class="bi bi-robot fs-5"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold text-dark mb-0">Gemini Success Predictor</h5>
+              <p class="text-muted small mb-0">AI-driven academic risk &amp; grade forecasting</p>
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-4">
+          <!-- Selection & Current Status Summary Header -->
+          <div class="p-3 bg-light rounded-3 mb-4 border">
+            <div class="row align-items-center g-3">
+              <div class="col-md-6 border-end">
+                <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Target Student</span>
+                <h5 class="fw-bold text-dark mb-1" id="predictModalStudentName">-</h5>
+                <p class="text-muted small mb-0" id="predictModalRollNo">-</p>
+              </div>
+              <div class="col-md-6">
+                <div class="row text-center g-2">
+                  <div class="col-4">
+                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Attendance</span>
+                    <strong class="text-primary" id="predictModalAttendance">-</strong>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted small d-block" style="font-size: 0.75rem;">CIA Score</span>
+                    <strong class="text-success" id="predictModalCia">-</strong>
+                  </div>
+                  <div class="col-4">
+                    <span class="text-muted small d-block" style="font-size: 0.75rem;">Lab Score</span>
+                    <strong class="text-warning" id="predictModalLab">-</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading Indicator -->
+          <div id="predictModalLoading" class="text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <h6 class="fw-bold text-dark">Consulting Gemini AI Models...</h6>
+            <p class="text-muted small">Analyzing grade trajectories and compliance thresholds.</p>
+          </div>
+
+          <!-- AI Report Container -->
+          <div id="predictModalContent" class="d-none">
+            <!-- Summary Badges -->
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <div class="p-3 bg-success-subtle border border-success rounded-3 text-center" id="predictModalGradeContainer">
+                  <span class="text-success small fw-semibold text-uppercase d-block mb-1">Predicted Semester Grade</span>
+                  <h2 class="fw-bold text-success mb-0" style="font-size: 1.5rem;" id="predictModalGrade">-</h2>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-primary-subtle border border-primary rounded-3 text-center" id="predictModalComplianceContainer">
+                  <span class="text-primary small fw-semibold text-uppercase d-block mb-1">Exam Eligibility</span>
+                  <h2 class="fw-bold text-primary mb-0" style="font-size: 1.5rem;" id="predictModalCompliance">-</h2>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic response -->
+            <div class="p-3 bg-white border rounded-3" style="max-height: 300px; overflow-y: auto;">
+              <h6 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-file-earmark-text-fill text-primary me-2"></i>Personalized Guidance Report</h6>
+              <div id="predictModalAiText" class="text-dark small" style="line-height: 1.6;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close Predictor</button>
+          <button type="button" class="btn btn-primary px-4" onclick="regeneratePredictSuccess()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Recalculate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JavaScript Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JS Logic Script -->
+  <script>
+    // State management
+    let currentRole = 'STAFF'; // default
+
+    const usersMetadata = {
+      ADMIN: {
+        name: 'Dean John Doe',
+        roleLabel: 'Principal Dean',
+        avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150'
+      },
+      STAFF: {
+        name: 'Dr. Sarah Conner',
+        roleLabel: 'Senior Lecturer',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150'
+      },
+      STUDENT: {
+        name: 'John Doe',
+        roleLabel: 'Sem 8 Student',
+        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150'
+      }
+    };
+
+    // DB data simulation (In-memory storage for presentation interaction)
+    let studentsDatabase = [
+      { id: 1, name: "John Doe", rollNumber: "CSE-2026-001", department: "CSE", semester: "Sem 8", profileColorHex: "#FFD8E4" },
+      { id: 2, name: "Sarah Khan", rollNumber: "CSE-2026-002", department: "CSE", semester: "Sem 8", profileColorHex: "#D0BCFF" },
+      { id: 3, name: "Alex Mercer", rollNumber: "CSE-2026-003", department: "CSE", semester: "Sem 8", profileColorHex: "#C2E7FF" },
+      { id: 4, name: "Ram Vishal", rollNumber: "CSE-2026-004", department: "CSE", semester: "Sem 8", profileColorHex: "#FFF0AA" },
+      { id: 5, name: "Priya Lakshmi", rollNumber: "CSE-2026-005", department: "CSE", semester: "Sem 8", profileColorHex: "#C8F7C5" },
+      { id: 6, name: "Marcus Brown", rollNumber: "CSE-2026-006", department: "CSE", semester: "Sem 8", profileColorHex: "#FFD8BE" }
+    ];
+
+    let staffDatabase = [
+      { id: 1, name: "Dr. Sarah Conner", role: "Senior Lecturer", department: "CSE", subject: "Java Full Stack Dev" },
+      { id: 2, name: "Prof. Alan Turing", role: "Department Head", department: "CSE", subject: "Machine Learning" },
+      { id: 3, name: "Grace Hopper", role: "Assistant Professor", department: "CSE", subject: "Cloud Computing" }
+    ];
+
+    let classSessions = [
+      { id: 1, subjectName: "Java Full Stack Dev", subjectCode: "CSE-801", room: "Lab Room 12B", startTime: "09:30 AM", endTime: "11:30 AM", date: "2026-06-29", attendanceTaken: false },
+      { id: 2, subjectName: "Machine Learning", subjectCode: "CSE-802", room: "Lecture Hall A", startTime: "11:30 AM", endTime: "01:00 PM", date: "2026-06-28", attendanceTaken: true },
+      { id: 3, subjectName: "Cloud Computing", subjectCode: "CSE-803", room: "Seminar Room 3", startTime: "02:00 PM", endTime: "03:30 PM", date: "2026-06-27", attendanceTaken: true }
+    ];
+
+    let markingSessionState = null;
+    let markingAttendanceMap = {}; // studentId -> boolean
+
+    // Date init
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const now = new Date();
+    document.getElementById('currentDateString').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+    // Role select handler
+    function selectRole(role) {
+      currentRole = role;
+      const tabs = ['admin', 'staff', 'student'];
+      tabs.forEach(tab => {
+        const btn = document.getElementById(`${tab}-tab`);
+        if (tab === role.toLowerCase()) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      
+      // Seed default username
+      const userField = document.getElementById('usernameInput');
+      userField.value = `${role.toLowerCase()}_user`;
+    }
+
+    // Login logic simulator
+    function handleLogin(e) {
+      e.preventDefault();
+      
+      // Update UI Header and Nav elements
+      const metadata = usersMetadata[currentRole];
+      document.getElementById('sidebarName').textContent = metadata.name;
+      document.getElementById('sidebarRoleLabel').textContent = metadata.roleLabel;
+      document.getElementById('navName').textContent = metadata.name;
+      document.getElementById('sidebarAvatar').src = metadata.avatar;
+      document.getElementById('navAvatar').src = metadata.avatar;
+      document.getElementById('profileCardAvatar').src = metadata.avatar;
+      document.getElementById('profileCardName').textContent = metadata.name;
+      document.getElementById('profileCardRole').textContent = `${metadata.roleLabel} • CSE Dept`;
+      document.getElementById('profileInputName').value = metadata.name;
+      document.getElementById('profileInputDesignation').value = metadata.roleLabel;
+
+      // Adjust Sidebar tabs showing
+      if (currentRole === 'ADMIN') {
+        document.getElementById('nav-attendance-wrapper').classList.remove('d-none');
+        document.getElementById('nav-students-wrapper').classList.remove('d-none');
+        document.getElementById('nav-staff-wrapper').classList.remove('d-none');
+      } else if (currentRole === 'STAFF') {
+        document.getElementById('nav-attendance-wrapper').classList.remove('d-none');
+        document.getElementById('nav-students-wrapper').classList.remove('d-none');
+        document.getElementById('nav-staff-wrapper').classList.add('d-none');
+      } else if (currentRole === 'STUDENT') {
+        document.getElementById('nav-attendance-wrapper').classList.add('d-none');
+        document.getElementById('nav-students-wrapper').classList.add('d-none');
+        document.getElementById('nav-staff-wrapper').classList.add('d-none');
+      }
+
+      // Display main container
+      document.getElementById('loginPage').classList.add('d-none');
+      document.getElementById('mainPortal').classList.remove('d-none');
+      
+      // Render Initial View
+      renderRoleHomeDashboard();
+      initAnalyticsCharts();
+    }
+
+    function logout() {
+      document.getElementById('mainPortal').classList.add('d-none');
+      document.getElementById('loginPage').classList.remove('d-none');
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    // Navigation logic
+    function switchTab(tabId) {
+      // Hide all pages
+      document.getElementById('page-admin-dashboard').classList.add('d-none');
+      document.getElementById('page-staff-dashboard').classList.add('d-none');
+      document.getElementById('page-student-dashboard').classList.add('d-none');
+      document.getElementById('page-attendance').classList.add('d-none');
+      document.getElementById('page-students').classList.add('d-none');
+      document.getElementById('page-staff').classList.add('d-none');
+      document.getElementById('page-reports').classList.add('d-none');
+      document.getElementById('page-charts').classList.add('d-none');
+      document.getElementById('page-profile').classList.add('d-none');
+      document.getElementById('page-ai-portal').classList.add('d-none');
+
+      // Un-highlight nav items
+      const links = document.querySelectorAll('.sidebar-link');
+      links.forEach(l => l.classList.remove('active'));
+
+      // Mark correct link active
+      document.getElementById(`nav-${tabId}`).classList.add('active');
+
+      if (tabId === 'dashboard') {
+        renderRoleHomeDashboard();
+      } else {
+        document.getElementById(`page-${tabId}`).classList.remove('d-none');
+      }
+
+      // Specific page setups
+      if (tabId === 'students') {
+        renderStudentsTable();
+      } else if (tabId === 'staff') {
+        renderStaffTable();
+      } else if (tabId === 'ai-portal') {
+        initAiPortal();
+      }
+
+      // Close mobile sidebar if sliding
+      document.getElementById('sidebar').classList.remove('active');
+    }
+
+    // Role-based home screen router
+    function renderRoleHomeDashboard() {
+      document.getElementById('page-admin-dashboard').classList.add('d-none');
+      document.getElementById('page-staff-dashboard').classList.add('d-none');
+      document.getElementById('page-student-dashboard').classList.add('d-none');
+
+      if (currentRole === 'ADMIN') {
+        document.getElementById('page-admin-dashboard').classList.remove('d-none');
+        document.getElementById('admin-total-students').textContent = studentsDatabase.length;
+        document.getElementById('admin-total-staff').textContent = staffDatabase.length;
+      } else if (currentRole === 'STAFF') {
+        document.getElementById('page-staff-dashboard').classList.remove('d-none');
+        renderStaffDashboardSessions();
+      } else if (currentRole === 'STUDENT') {
+        document.getElementById('page-student-dashboard').classList.remove('d-none');
+      }
+    }
+
+    // UI Render lists
+    function renderStaffDashboardSessions() {
+      const container = document.getElementById('staff-dashboard-sessions');
+      container.innerHTML = '';
+      
+      classSessions.forEach(session => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><span class="fw-semibold text-dark">${session.subjectName}</span></td>
+          <td><code>${session.subjectCode}</code></td>
+          <td>${session.room}</td>
+          <td>${session.startTime} - ${session.endTime}</td>
+          <td>
+            <span class="status-badge ${session.attendanceTaken ? 'status-present' : 'status-absent'}">
+              ${session.attendanceTaken ? 'Taken' : 'Pending'}
+            </span>
+          </td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary rounded-3" onclick="loadAttendancePageForSession(${session.id})">
+              ${session.attendanceTaken ? 'Update' : 'Mark'}
+            </button>
+          </td>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function loadAttendancePageForSession(sessionId) {
+      switchTab('attendance');
+      const session = classSessions.find(s => s.id === sessionId);
+      if (session) {
+        document.getElementById('attendanceSubjectSelect').value = session.subjectCode;
+        document.getElementById('attendanceRoomSelect').value = session.room;
+        document.getElementById('attendanceDateSelect').value = session.date;
+        startLoadingAttendanceList(session);
+      }
+    }
+
+    function renderStudentsTable() {
+      const container = document.getElementById('studentsTableBody');
+      container.innerHTML = '';
+
+      studentsDatabase.forEach(st => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: ${st.profileColorHex};">
+                ${st.name.substring(0,2).toUpperCase()}
+              </div>
+              <span class="fw-semibold text-dark">${st.name}</span>
+            </div>
+          </td>
+          <td><code>${st.rollNumber}</code></td>
+          <td>${st.department}</td>
+          <td>${st.semester}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary p-1 px-2.5 me-2" onclick="predictStudentSuccess(${st.id})">
+              <i class="bi bi-robot me-1"></i> Predict Success
+            </button>
+            <button class="btn btn-sm btn-light text-danger p-1 px-2 border" onclick="deleteStudent(${st.id})">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderStaffTable() {
+      const container = document.getElementById('staffTableBody');
+      container.innerHTML = '';
+
+      staffDatabase.forEach(sf => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div class="fw-semibold text-dark">${sf.name}</div>
+          </td>
+          <td>${sf.role}</td>
+          <td><span class="badge bg-light text-dark border">${sf.department}</span></td>
+          <td><code>${sf.subject}</code></td>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // Attendance desk interactive marking flows
+    function startLoadingAttendanceList(explicitSession = null) {
+      document.getElementById('attendanceListSection').classList.remove('d-none');
+      
+      const sub = document.getElementById('attendanceSubjectSelect').value;
+      const room = document.getElementById('attendanceRoomSelect').value;
+      const date = document.getElementById('attendanceDateSelect').value;
+
+      markingSessionState = explicitSession || classSessions.find(s => s.subjectCode === sub && s.date === date) || {
+        id: Math.floor(Math.random() * 1000) + 10,
+        subjectName: "Quick Scheduled Class",
+        subjectCode: sub,
+        room: room,
+        date: date,
+        attendanceTaken: false
+      };
+
+      // Reset attendance state to true (present) for all
+      markingAttendanceMap = {};
+      studentsDatabase.forEach(st => {
+        markingAttendanceMap[st.id] = true;
+      });
+
+      renderAttendanceMarkingRows();
+    }
+
+    function renderAttendanceMarkingRows() {
+      const container = document.getElementById('attendance-marking-rows');
+      container.innerHTML = '';
+
+      studentsDatabase.forEach(st => {
+        const isPresent = markingAttendanceMap[st.id] !== false;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background-color: ${st.profileColorHex};">
+                ${st.name.substring(0,2).toUpperCase()}
+              </div>
+              <span class="fw-semibold text-dark">${st.name}</span>
+            </div>
+          </td>
+          <td><code>${st.rollNumber}</code></td>
+          <td>${st.department}</td>
+          <td>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" ${isPresent ? 'checked' : ''} onchange="toggleIndividualAttendance(${st.id})">
+              <span class="badge ${isPresent ? 'status-present' : 'status-absent'} ms-2" id="badge-st-${st.id}">
+                ${isPresent ? 'Present' : 'Absent'}
+              </span>
+            </div>
+          </td>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function toggleIndividualAttendance(studentId) {
+      markingAttendanceMap[studentId] = !markingAttendanceMap[studentId];
+      const val = markingAttendanceMap[studentId];
+      const badge = document.getElementById(`badge-st-${studentId}`);
+      if (val) {
+        badge.textContent = 'Present';
+        badge.className = 'badge status-present ms-2';
+      } else {
+        badge.textContent = 'Absent';
+        badge.className = 'badge status-absent ms-2';
+      }
+    }
+
+    function setAllAttendance(isPresent) {
+      studentsDatabase.forEach(st => {
+        markingAttendanceMap[st.id] = isPresent;
+      });
+      renderAttendanceMarkingRows();
+    }
+
+    function submitActiveAttendance() {
+      if (markingSessionState) {
+        const existingSession = classSessions.find(s => s.id === markingSessionState.id);
+        if (existingSession) {
+          existingSession.attendanceTaken = true;
+        } else {
+          markingSessionState.attendanceTaken = true;
+          classSessions.push(markingSessionState);
+        }
+      }
+      
+      alert("Attendance records updated successfully! Portal synced with central SQL cloud.");
+      document.getElementById('attendanceListSection').classList.add('d-none');
+      switchTab('dashboard');
+    }
+
+    function cancelMarking() {
+      document.getElementById('attendanceListSection').classList.add('d-none');
+    }
+
+    // Student Registry changes
+    function handleRegisterStudent(e) {
+      e.preventDefault();
+      const name = document.getElementById('addStudentName').value;
+      const roll = document.getElementById('addStudentRoll').value;
+      const sem = document.getElementById('addStudentSem').value;
+      const colors = ["#FFD8E4", "#D0BCFF", "#C2E7FF", "#FFF0AA", "#C8F7C5", "#FFD8BE"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+      const newStudent = {
+        id: studentsDatabase.length + 1,
+        name: name,
+        rollNumber: roll,
+        department: "CSE",
+        semester: sem,
+        profileColorHex: randomColor
+      };
+
+      studentsDatabase.push(newStudent);
+      
+      // close bootstrap modal
+      const modalEl = document.getElementById('addStudentModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+
+      // Reset form
+      e.target.reset();
+
+      renderStudentsTable();
+      alert("Student profile registered successfully!");
+    }
+
+    function deleteStudent(id) {
+      if (confirm("Are you sure you want to remove this student?")) {
+        studentsDatabase = studentsDatabase.filter(st => st.id !== id);
+        renderStudentsTable();
+      }
+    }
+
+    // Success Predictor JS functions
+    let currentPredictStudentId = null;
+
+    function calculateStudentStatus(studentId) {
+      const student = studentsDatabase.find(st => st.id === studentId);
+      if (!student) return null;
+      
+      const aiData = getStudentAiData(studentId);
+      const predictedAttendancePct = aiData.currentAttendance;
+      
+      let attendanceMarks = 0;
+      if (predictedAttendancePct >= 95.0) attendanceMarks = 30;
+      else if (predictedAttendancePct >= 90.0) attendanceMarks = 28;
+      else if (predictedAttendancePct >= 85.0) attendanceMarks = 25;
+      else if (predictedAttendancePct >= 80.0) attendanceMarks = 22;
+      else if (predictedAttendancePct >= 75.0) attendanceMarks = 18;
+      else attendanceMarks = 0;
+
+      const totalMarks = aiData.cia + aiData.lab + attendanceMarks;
+
+      let grade = "F";
+      let status = "RE-APPEAR";
+      if (totalMarks >= 90) {
+        grade = "A+";
+        status = "EXCELLENT";
+      } else if (totalMarks >= 80) {
+        grade = "A";
+        status = "VERY GOOD";
+      } else if (totalMarks >= 70) {
+        grade = "B+";
+        status = "GOOD";
+      } else if (totalMarks >= 60) {
+        grade = "B";
+        status = "AVERAGE";
+      } else if (totalMarks >= 50) {
+        grade = "C";
+        status = "PASS";
+      } else {
+        grade = "F";
+        status = "AT RISK";
+      }
+
+      const eligible = predictedAttendancePct >= 75.0 ? "ELIGIBLE" : "DEBARRED RISK";
+
+      return {
+        name: student.name,
+        rollNumber: student.rollNumber,
+        attendance: predictedAttendancePct + "%",
+        cia: aiData.cia + " / 60",
+        lab: aiData.lab + " / 10",
+        grade: grade,
+        status: status,
+        eligible: eligible,
+        aiData: aiData
+      };
+    }
+
+    function predictStudentSuccess(studentId) {
+      currentPredictStudentId = studentId;
+      const statusData = calculateStudentStatus(studentId);
+      if (!statusData) return;
+
+      // Populate static data in the modal
+      document.getElementById('predictModalStudentName').textContent = statusData.name;
+      document.getElementById('predictModalRollNo').textContent = "Roll Number: " + statusData.rollNumber;
+      document.getElementById('predictModalAttendance').textContent = statusData.attendance;
+      document.getElementById('predictModalCia').textContent = statusData.cia;
+      document.getElementById('predictModalLab').textContent = statusData.lab;
+
+      // Show loading state
+      document.getElementById('predictModalLoading').classList.remove('d-none');
+      document.getElementById('predictModalContent').classList.add('d-none');
+
+      // Trigger bootstrap modal
+      const modalEl = document.getElementById('predictSuccessModal');
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+
+      // Ask Gemini AI
+      const prompt = `
+        You are the SmartAttend AI Success Predictor Counselor for the Computer Science Department.
+        Respond to the student academic forecast in a constructive, highly detailed, academic, and professional tone.
+        
+        CONTEXT FOR ANALYSIS:
+        - Student Name: ${statusData.name}
+        - Roll Number: ${statusData.rollNumber}
+        - Projected Final Attendance Rate: ${statusData.attendance}
+        - Continuous Assessment Test Score (CIA): ${statusData.cia}
+        - Practical Laboratory Component Score: ${statusData.lab}
+        - Predicted Terminal Grade Standing: ${statusData.grade} (${statusData.status})
+        - Terminal Examination Eligibility: ${statusData.eligible}
+        
+        Please generate a personalized 2-paragraph success plan. Keep it encouraging but realistic based on their standing:
+        - Paragraph 1: Detailed analysis of their grade trajectory and current standing.
+        - Paragraph 2: Actionable steps for further academic improvement.
+        
+        Format the response with Markdown bold (**text**) and clear bulleted itemized lists where helpful. Avoid generic statements; personalize it to their scores.
+      `;
+
+      askGeminiAI(prompt, "onGeminiPredictSuccessResult");
+    }
+
+    function onGeminiPredictSuccessResult(response) {
+      // Remove loading state
+      document.getElementById('predictModalLoading').classList.add('d-none');
+      document.getElementById('predictModalContent').classList.remove('d-none');
+
+      const statusData = calculateStudentStatus(currentPredictStudentId);
+      if (!statusData) return;
+
+      // Set grade & compliance badge UI and background styling
+      const gradeElem = document.getElementById('predictModalGrade');
+      gradeElem.textContent = statusData.grade + " (" + statusData.status + ")";
+
+      const gradeCont = document.getElementById('predictModalGradeContainer');
+      const compCont = document.getElementById('predictModalComplianceContainer');
+
+      // Reset classes
+      gradeCont.className = "p-3 border rounded-3 text-center ";
+      compCont.className = "p-3 border rounded-3 text-center ";
+
+      if (statusData.grade === "A+" || statusData.grade === "A") {
+        gradeCont.className += "bg-success-subtle border-success text-success";
+      } else if (statusData.grade === "B+" || statusData.grade === "B") {
+        gradeCont.className += "bg-primary-subtle border-primary text-primary";
+      } else if (statusData.grade === "C") {
+        gradeCont.className += "bg-warning-subtle border-warning text-warning";
+      } else {
+        gradeCont.className += "bg-danger-subtle border-danger text-danger";
+      }
+
+      const compElem = document.getElementById('predictModalCompliance');
+      compElem.textContent = statusData.eligible;
+
+      if (statusData.eligible === "ELIGIBLE") {
+        compCont.className += "bg-success-subtle border-success text-success";
+      } else {
+        compCont.className += "bg-danger-subtle border-danger text-danger";
+      }
+
+      // Convert response markdown to HTML
+      const formattedResponse = formatMarkdownResponse(response);
+      document.getElementById('predictModalAiText').innerHTML = formattedResponse;
+    }
+
+    function regeneratePredictSuccess() {
+      if (currentPredictStudentId !== null) {
+        predictStudentSuccess(currentPredictStudentId);
+      }
+    }
+
+    // Faculty Registry changes
+    function handleRegisterStaff(e) {
+      e.preventDefault();
+      const name = document.getElementById('addStaffName').value;
+      const role = document.getElementById('addStaffRole').value;
+      const subject = document.getElementById('addStaffSubject').value;
+
+      const newStaff = {
+        id: staffDatabase.length + 1,
+        name: name,
+        role: role,
+        department: "CSE",
+        subject: subject
+      };
+
+      staffDatabase.push(newStaff);
+
+      const modalEl = document.getElementById('addStaffModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+
+      e.target.reset();
+
+      renderStaffTable();
+      alert("Faculty member registered successfully!");
+    }
+
+    // Student search
+    function filterStudentsTable() {
+      const q = document.getElementById('studentSearchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#studentsTableBody tr');
+      rows.forEach(row => {
+        const txt = row.textContent.toLowerCase();
+        if (txt.includes(q)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Profile Settings saving
+    function saveProfileChanges(e) {
+      e.preventDefault();
+      const newName = document.getElementById('profileInputName').value;
+      const newRole = document.getElementById('profileInputDesignation').value;
+
+      usersMetadata[currentRole].name = newName;
+      usersMetadata[currentRole].roleLabel = newRole;
+
+      document.getElementById('sidebarName').textContent = newName;
+      document.getElementById('sidebarRoleLabel').textContent = newRole;
+      document.getElementById('navName').textContent = newName;
+      document.getElementById('profileCardName').textContent = newName;
+      document.getElementById('profileCardRole').textContent = `${newRole} • CSE Dept`;
+
+      alert("Profile updated successfully!");
+    }
+
+    // AI Report logic trigger
+    function triggerAiReport() {
+      const loader = document.getElementById('aiReportLoading');
+      const showcase = document.getElementById('aiReportShowcase');
+
+      loader.classList.remove('d-none');
+      showcase.classList.add('d-none');
+
+      const lowAttenders = studentsDatabase.slice(0, 3).map(s => s.name).join(", ");
+      const prompt = `
+        Create a professional executive attendance and academic intervention report draft for college lecturers based on the following metrics:
+        - Class Name: Computer Science Final Year (Batch of 2026)
+        - Average Attendance Rate: 92.4%
+        - Flagged Low Attending Students: ${lowAttenders}
+        
+        The report must be concise, structured under 3 main sections:
+        1. Executive Performance Summary
+        2. Detected Attendance Alert Candidates (under 75% minimum compliance limit)
+        3. Actionable Remedial Steps for Lecturers
+        
+        Ensure a professional, highly formal department tone. Provide clear section headers without markdown bold tags.
+      `;
+
+      askGeminiAI(prompt, "onGeminiReportResult");
+    }
+
+    function onGeminiReportResult(response) {
+      const loader = document.getElementById('aiReportLoading');
+      const showcase = document.getElementById('aiReportShowcase');
+      
+      loader.classList.add('d-none');
+      showcase.classList.remove('d-none');
+      document.getElementById('aiReportTextContainer').textContent = response;
+    }
+
+    // ==================== AI PORTAL ENGINE LOGIC ====================
+    const studentBaseAiData = {
+      1: { currentAttendance: 95.6, cia: 51, lab: 9, attended: 38, totalClasses: 40, email: "john.doe@college.edu" },
+      2: { currentAttendance: 72.0, cia: 38, lab: 6, attended: 29, totalClasses: 40, email: "sarah.khan@college.edu" },
+      3: { currentAttendance: 88.5, cia: 48, lab: 8, attended: 35, totalClasses: 40, email: "alex.mercer@college.edu" },
+      4: { currentAttendance: 91.2, cia: 54, lab: 9, attended: 36, totalClasses: 40, email: "ram.vishal@college.edu" },
+      5: { currentAttendance: 64.5, cia: 30, lab: 5, attended: 26, totalClasses: 40, email: "priya.lakshmi@college.edu" },
+      6: { currentAttendance: 79.8, cia: 42, lab: 7, attended: 32, totalClasses: 40, email: "marcus.brown@college.edu" }
+    };
+
+    function getStudentAiData(studentId) {
+      if (studentBaseAiData[studentId]) {
+        return studentBaseAiData[studentId];
+      }
+      // Fallback default for newly registered students
+      return { currentAttendance: 80.0, cia: 45, lab: 8, attended: 32, totalClasses: 40, email: "student_" + studentId + "@college.edu" };
+    }
+
+    function initAiPortal() {
+      const selector = document.getElementById('aiStudentSelector');
+      selector.innerHTML = '';
+      
+      studentsDatabase.forEach(student => {
+        const opt = document.createElement('option');
+        opt.value = student.id;
+        opt.textContent = `${student.name} (${student.rollNumber})`;
+        selector.appendChild(opt);
+      });
+
+      // Load initial selected student
+      loadSelectedStudentAiData();
+    }
+
+    function loadSelectedStudentAiData() {
+      const selector = document.getElementById('aiStudentSelector');
+      const studentId = parseInt(selector.value);
+      if (isNaN(studentId)) return;
+
+      const aiData = getStudentAiData(studentId);
+      
+      // Update basic inputs
+      document.getElementById('aiCurrentAttendance').value = aiData.currentAttendance + "%";
+      
+      // Reset sliders
+      document.getElementById('aiAbsenceSimulatorSlider').value = 0;
+      document.getElementById('sliderValueText').textContent = "0 classes missed";
+      
+      document.getElementById('aiCiaSimulatorSlider').value = aiData.cia;
+      document.getElementById('aiCiaText').textContent = aiData.cia + " / 60";
+      
+      document.getElementById('aiLabSimulatorSlider').value = aiData.lab;
+      document.getElementById('aiLabText').textContent = aiData.lab + " / 10";
+
+      // Run simulations
+      runAttendanceSimulation();
+      runPerformanceSimulation();
+    }
+
+    function runAttendanceSimulation() {
+      const selector = document.getElementById('aiStudentSelector');
+      const studentId = parseInt(selector.value);
+      if (isNaN(studentId)) return;
+
+      const aiData = getStudentAiData(studentId);
+      const simulatedAbsences = parseInt(document.getElementById('aiAbsenceSimulatorSlider').value);
+      
+      // Update label
+      document.getElementById('sliderValueText').textContent = simulatedAbsences + (simulatedAbsences === 1 ? " class missed" : " classes missed");
+
+      // We assume 40 completed sessions, 40 remaining sessions, total 80.
+      // Current aggregate maps to aiData.attended attended classes
+      const currentAttended = aiData.attended;
+      const futureRemaining = 40;
+      const futureAttended = Math.max(0, futureRemaining - simulatedAbsences);
+      const predictedAttendedTotal = currentAttended + futureAttended;
+      const predictedTotalSessions = 80;
+      
+      const predictedAttendancePct = parseFloat(((predictedAttendedTotal / predictedTotalSessions) * 100).toFixed(1));
+
+      // Update aggregate text
+      document.getElementById('aiPredictedAttendance').textContent = predictedAttendancePct + "%";
+
+      // Update standing banner card
+      const alertCard = document.getElementById('aiAlertStatusCard');
+      const alertIcon = document.getElementById('aiAlertStatusIcon');
+      const alertTitle = document.getElementById('aiAlertStatusTitle');
+      const alertDesc = document.getElementById('aiAlertStatusDesc');
+      const emailBlock = document.getElementById('aiEmailAlertContainer');
+
+      if (predictedAttendancePct < 75.0) {
+        // At Risk / Shortage
+        alertCard.style.background = "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)";
+        alertIcon.className = "bi bi-exclamation-triangle-fill fs-5 text-danger";
+        alertCard.querySelector('.rounded-circle').className = "bg-white text-danger rounded-circle p-2 d-flex align-items-center justify-content-center";
+        alertTitle.textContent = "Attendance Shortage Alert";
+        alertDesc.textContent = `CRITICAL WARNING: Attendance is projected to drop below the university minimum to ${predictedAttendancePct}%. Debarment warning active.`;
+        
+        // Show low attendance alert and send email dispatch capability
+        emailBlock.classList.remove('d-none');
+        document.getElementById('aiAttendanceStandingText').innerHTML = `<span class="text-danger fw-bold"><i class="bi bi-x-circle-fill me-1"></i>Predicted Shortage Risk Detected</span>`;
+      } else {
+        // Safe Standing
+        alertCard.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+        alertIcon.className = "bi bi-shield-check fs-5 text-success";
+        alertCard.querySelector('.rounded-circle').className = "bg-white text-success rounded-circle p-2 d-flex align-items-center justify-content-center";
+        alertTitle.textContent = "Excellent Standing";
+        alertDesc.textContent = "Attendance prediction is comfortably in good standing. No shortage risk detected.";
+        
+        // Hide email dispatch
+        emailBlock.classList.add('d-none');
+        document.getElementById('aiAttendanceStandingText').innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>Good Academic Standing</span>`;
+      }
+
+      // Re-run performance as attendance influences internal marks
+      runPerformanceSimulation();
+    }
+
+    function runPerformanceSimulation() {
+      const cia = parseInt(document.getElementById('aiCiaSimulatorSlider').value);
+      const lab = parseInt(document.getElementById('aiLabSimulatorSlider').value);
+      
+      document.getElementById('aiCiaText').textContent = cia + " / 60";
+      document.getElementById('aiLabText').textContent = lab + " / 10";
+
+      // Calculate attendance marks (out of 30) based on predicted attendance
+      const predictedAttText = document.getElementById('aiPredictedAttendance').textContent;
+      const predictedAttendancePct = parseFloat(predictedAttText);
+      
+      let attendanceMarks = 0;
+      if (predictedAttendancePct >= 95.0) attendanceMarks = 30;
+      else if (predictedAttendancePct >= 90.0) attendanceMarks = 28;
+      else if (predictedAttendancePct >= 85.0) attendanceMarks = 25;
+      else if (predictedAttendancePct >= 80.0) attendanceMarks = 22;
+      else if (predictedAttendancePct >= 75.0) attendanceMarks = 18;
+      else attendanceMarks = 0; // Debarred/shortage
+
+      const totalMarks = cia + lab + attendanceMarks;
+
+      // Map to grade
+      let grade = "F";
+      let status = "RE-APPEAR";
+      let statusClass = "bg-danger text-danger-emphasis border-danger";
+      let progressClass = "bg-danger";
+      let feedback = "";
+
+      const studentName = document.getElementById('aiStudentSelector').options[document.getElementById('aiStudentSelector').selectedIndex]?.text.split(' (')[0] || "Student";
+
+      if (totalMarks >= 90) {
+        grade = "A+";
+        status = "EXCELLENT";
+        statusClass = "bg-success-subtle text-success border-success";
+        progressClass = "bg-success";
+        feedback = `${studentName} is tracking at the highest standard. Strong assessment scores (${cia}/60) and excellent attendance indicate high likelihood of university ranking.`;
+      } else if (totalMarks >= 80) {
+        grade = "A";
+        status = "VERY GOOD";
+        statusClass = "bg-primary-subtle text-primary border-primary";
+        progressClass = "bg-primary";
+        feedback = `Very solid performance. Maintaining current assessment prep (${cia}/60) will comfortably secure an 'A' Grade in terminal university examinations.`;
+      } else if (totalMarks >= 70) {
+        grade = "B+";
+        status = "GOOD";
+        statusClass = "bg-info-subtle text-info border-info";
+        progressClass = "bg-info";
+        feedback = `Good progress. To advance ${studentName} into the 'A' grade range, focus on maximizing the Continuous Assessments and securing full lab components.`;
+      } else if (totalMarks >= 60) {
+        grade = "B";
+        status = "AVERAGE";
+        statusClass = "bg-warning-subtle text-warning border-warning";
+        progressClass = "bg-warning";
+        feedback = `Consistent average performance. Some additional focus in core test materials is advised to lift assessments into more competitive score tiers.`;
+      } else if (totalMarks >= 50) {
+        grade = "C";
+        status = "PASS";
+        statusClass = "bg-secondary-subtle text-secondary border-secondary";
+        progressClass = "bg-secondary";
+        feedback = `Passing grade predicted. Regular revision and active attendance compliance are recommended to prevent sliding into academic shortage zones.`;
+      } else {
+        grade = "F";
+        status = "AT RISK";
+        statusClass = "bg-danger-subtle text-danger border-danger";
+        progressClass = "bg-danger";
+        feedback = `CRITICAL WARNING: ${studentName} is predicted to fail or be disqualified due to low assessment scores or a severe attendance shortage (Attendance Marks: ${attendanceMarks}/30). Immediate academic intervention required.`;
+      }
+
+      // Update Grade UI
+      const gradeElem = document.getElementById('aiPredictedGrade');
+      gradeElem.textContent = grade;
+      gradeElem.className = `fw-bold display-4 my-2 text-${progressClass.replace('bg-', '')}`;
+
+      const statusElem = document.getElementById('aiPredictedGradeStatus');
+      statusElem.textContent = status;
+      statusElem.className = `badge ${statusClass} px-3 py-1.5 rounded-pill fw-bold`;
+
+      const progressBar = document.getElementById('aiPerformanceProgressBar');
+      progressBar.style.width = totalMarks + "%";
+      progressBar.className = `progress-bar ${progressClass}`;
+
+      document.getElementById('aiPerformanceFeedbackText').textContent = feedback;
+
+      // Update Certificate dynamic info
+      const certNameElem = document.getElementById('aiCertificateStudentName');
+      if (certNameElem) {
+        certNameElem.textContent = studentName;
+      }
+      const certGradeElem = document.getElementById('aiCertificateGrade');
+      if (certGradeElem) {
+        let divText = "CLASS FIRST DIVISION (" + grade + ")";
+        let divClass = "bg-success-subtle text-success border-success";
+        if (grade === "A+") {
+          divText = "HONORS FIRST CLASS DISTINCTION (A+)";
+          divClass = "bg-warning-subtle text-warning border-warning";
+        } else if (grade === "A") {
+          divText = "FIRST CLASS DIVISION (A)";
+          divClass = "bg-success-subtle text-success border-success";
+        } else if (grade === "B+" || grade === "B") {
+          divText = "SECOND CLASS DIVISION (" + grade + ")";
+          divClass = "bg-info-subtle text-info border-info";
+        } else if (grade === "C") {
+          divText = "PASS DIVISION (C)";
+          divClass = "bg-secondary-subtle text-secondary border-secondary";
+        } else {
+          divText = "ACADEMIC INTERVENTION REQUIRED (F)";
+          divClass = "bg-danger-subtle text-danger border-danger";
+        }
+        certGradeElem.textContent = divText;
+        certGradeElem.className = "badge " + divClass + " px-4 py-2 rounded-pill fw-bold fs-6";
+      }
+    }
+
+    function insertQuickChatQuery(text) {
+      document.getElementById('aiChatInputField').value = text;
+      // trigger form submit
+      const form = document.getElementById('aiChatForm');
+      const event = new Event('submit', { cancelable: true });
+      form.dispatchEvent(event);
+    }
+
+    function handleSendAiChatMessage(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      
+      const input = document.getElementById('aiChatInputField');
+      const messageText = input.value.trim();
+      if (!messageText) return;
+
+      input.value = '';
+
+      // Append User Message Bubble
+      appendChatMessage(messageText, true);
+
+      // Append typing indicator
+      const chatMessagesContainer = document.getElementById('aiChatboxMessages');
+      const typingBubble = document.createElement('div');
+      typingBubble.id = 'aiChatTypingIndicator';
+      typingBubble.className = 'd-flex align-items-start gap-2 mb-3';
+      typingBubble.innerHTML = `
+        <div class="bg-primary text-white rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+          <i class="bi bi-robot small"></i>
+        </div>
+        <div class="p-3 rounded-4 bg-white text-dark shadow-sm" style="border-top-left-radius: 0;">
+          <div class="d-flex gap-1">
+            <span class="spinner-grow spinner-grow-sm text-primary" role="status" style="animation-delay: 0.1s"></span>
+            <span class="spinner-grow spinner-grow-sm text-primary" role="status" style="animation-delay: 0.2s"></span>
+            <span class="spinner-grow spinner-grow-sm text-primary" role="status" style="animation-delay: 0.3s"></span>
+          </div>
+        </div>
+      `;
+      chatMessagesContainer.appendChild(typingBubble);
+      chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+
+      // Extract context details for incredibly smart customized responses
+      const selector = document.getElementById('aiStudentSelector');
+      const studentName = selector.options[selector.selectedIndex]?.text.split(' (')[0] || "John Doe";
+      const rollNo = selector.options[selector.selectedIndex]?.text.split('(')[1]?.replace(')', '') || "CSE-2026-001";
+      const currentAtt = document.getElementById('aiCurrentAttendance').value;
+      const predictedAtt = document.getElementById('aiPredictedAttendance').textContent;
+      const predictedGrade = document.getElementById('aiPredictedGrade').textContent;
+      const testScore = document.getElementById('aiCiaSimulatorSlider').value;
+      const labScore = document.getElementById('aiLabSimulatorSlider').value;
+
+      const structuredPrompt = `
+        You are the SmartAttend AI Academic Counselor for the Computer Science Department.
+        Respond to the student/faculty query in a constructive, encouraging, academic, and highly professional tone.
+        
+        CONTEXT:
+        - Target Student: ${studentName} (Roll No: ${rollNo})
+        - Current Attendance Aggregate: ${currentAtt}
+        - Simulated Predicted Attendance: ${predictedAtt}
+        - Current Test Assessment Score: ${testScore} / 60
+        - Simulated Lab Assessment Score: ${labScore} / 10
+        - Final Predicted Semester Grade: ${predictedGrade}
+        
+        USER QUERY:
+        "${messageText}"
+        
+        Please format your response into highly readable paragraphs. Use Markdown bold (e.g. **text**) and lists where appropriate. Keep your response under 3 concise paragraphs.
+      `;
+
+      askGeminiAI(structuredPrompt, "onGeminiChatResult");
+    }
+
+    function askGeminiAI(userPrompt, callbackName) {
+      if (window.AndroidBridge && typeof window.AndroidBridge.callGemini === 'function') {
+        window.AndroidBridge.callGemini(userPrompt, callbackName);
+      } else {
+        // Fallback for browser preview: Simulate a smart responsive AI reply
+        setTimeout(() => {
+          let reply = simulateSmartCounselorReply(userPrompt);
+          window[callbackName](reply);
+        }, 1500);
+      }
+    }
+
+    function onGeminiChatResult(response) {
+      // Remove typing indicator
+      const typingBubble = document.getElementById('aiChatTypingIndicator');
+      if (typingBubble) {
+        typingBubble.remove();
+      }
+
+      // Format markdown helper (e.g. bold and lists)
+      const formattedResponse = formatMarkdownResponse(response);
+
+      // Append Assistant Message Bubble
+      appendChatMessage(formattedResponse, false, true);
+    }
+
+    function appendChatMessage(text, isUser, isHtml = false) {
+      const container = document.getElementById('aiChatboxMessages');
+      const bubble = document.createElement('div');
+      bubble.className = isUser ? 'd-flex align-items-start gap-2 justify-content-end mb-3' : 'd-flex align-items-start gap-2 mb-3';
+      
+      const contentClass = isUser 
+        ? 'p-3 rounded-4 bg-primary text-white shadow-sm max-w-85' 
+        : 'p-3 rounded-4 bg-white text-dark shadow-sm max-w-85';
+      const inlineStyle = isUser ? 'border-top-right-radius: 0;' : 'border-top-left-radius: 0;';
+
+      const avatarHtml = isUser 
+        ? `
+          <div class="bg-primary text-white rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="bi bi-person small"></i>
+          </div>
+          `
+        : `
+          <div class="bg-primary text-white rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="bi bi-robot small"></i>
+          </div>
+          `;
+
+      bubble.innerHTML = isUser 
+        ? `
+          <div class="${contentClass}" style="${inlineStyle}">
+            <p class="mb-0 small">${isHtml ? text : escapeHtmlText(text)}</p>
+          </div>
+          ${avatarHtml}
+        `
+        : `
+          ${avatarHtml}
+          <div class="${contentClass}" style="${inlineStyle}">
+            <p class="mb-0 small">${isHtml ? text : escapeHtmlText(text)}</p>
+          </div>
+        `;
+
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtmlText(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatMarkdownResponse(text) {
+      // Bold formatter
+      let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // Lists formatter
+      formatted = formatted.replace(/^\s*\*\s+(.*?)$/gm, '<li class="small">$1</li>');
+      // Wrap list items in <ul> if found
+      formatted = formatted.replace(/(<li class="small">.*?<\/li>)+/g, '<ul class="ps-3 mb-2">$1</ul>');
+      // Replace double returns with paragraphs
+      formatted = formatted.replace(/\n\n/g, '<br><br>');
+      return formatted;
+    }
+
+    function sendSimulatedLowAttendanceEmail() {
+      const selector = document.getElementById('aiStudentSelector');
+      const studentId = parseInt(selector.value);
+      const studentName = selector.options[selector.selectedIndex]?.text.split(' (')[0] || "John Doe";
+      const aiData = getStudentAiData(studentId);
+      const predictedAtt = document.getElementById('aiPredictedAttendance').textContent;
+
+      alert(`📧 AUTOMATIC ALERT SENT SUCCESSFULLY!\n\nTo: ${aiData.email}\nSubject: [URGENT] Academic Attendance Compliance Warning\n\nDear ${studentName},\n\nOur systems have forecasted that your attendance aggregate will fall to ${predictedAtt} in the terminal week.\n\nPlease attend immediate remedial classes to secure exam eligibility.`);
+    }
+
+    function simulateSmartCounselorReply(prompt) {
+      prompt = prompt.toLowerCase();
+
+      if (prompt.includes("success predictor")) {
+        // Find matching student name in prompt or extract metadata
+        let studentName = "Student";
+        let attendance = "85%";
+        let cia = "45/60";
+        let lab = "8/10";
+        let grade = "A";
+        let eligible = "ELIGIBLE";
+        
+        // Extract from prompt if possible
+        const nameMatch = prompt.match(/student name:\s*([^\n]+)/i);
+        if (nameMatch) studentName = nameMatch[1].trim();
+        
+        const attMatch = prompt.match(/projected final attendance rate:\s*([^\n]+)/i);
+        if (attMatch) attendance = attMatch[1].trim();
+        
+        const ciaMatch = prompt.match(/continuous assessment test score \(cia\):\s*([^\n]+)/i);
+        if (ciaMatch) cia = ciaMatch[1].trim();
+
+        const labMatch = prompt.match(/practical laboratory component score:\s*([^\n]+)/i);
+        if (labMatch) lab = labMatch[1].trim();
+
+        const gradeMatch = prompt.match(/predicted terminal grade standing:\s*([^\n]+)/i);
+        if (gradeMatch) grade = gradeMatch[1].trim();
+
+        const eligibleMatch = prompt.match(/terminal examination eligibility:\s*([^\n]+)/i);
+        if (eligibleMatch) eligible = eligibleMatch[1].trim();
+
+        return `Based on high-fidelity trajectory models, **${studentName}** shows a predicted terminal standing of **${grade}**. With a forecasted final attendance rate of **${attendance}**, they are currently **${eligible}** for terminal board examinations.
+
+**Targeted Success Strategy:**
+* **Continuous Internal Assessments**: The Continuous Assessment (CIA) score is currently at **${cia}**. Boosting this slightly in final tests can elevate the terminal grade tier.
+* **Laboratory Proficiency**: Practical marks are set at **${lab}**. Continue submitting comprehensive lab logs on time to secure maximum weightage.
+* **Proactive Attendance Care**: Maintain or raise class presence to avoid falling into critical compliance zones. This is the surest way to lock in full internal marks!`;
+      }
+
+      const selector = document.getElementById('aiStudentSelector');
+      const studentName = selector.options[selector.selectedIndex]?.text.split(' (')[0] || "Student";
+      const attendance = document.getElementById('aiPredictedAttendance').textContent;
+      const grade = document.getElementById('aiPredictedGrade').textContent;
+      
+      if (prompt.includes("improve") || prompt.includes("how to")) {
+        return `As an Academic Counselor, here is a custom plan for **${studentName}** to improve performance:\n\n* **Regular Attendance**: With a predicted attendance of **${attendance}**, attending every single upcoming session is the most critical step. Raising this above 75% secures eligibility and unlocks attendance internal marks.\n* **Targeted Assessment Prep**: Focus on boosting Continuous Assessment (CIA) marks. Raising your test average by just 5-10% significantly changes the projected grade (currently **${grade}**).\n* **Structured Peer Study**: Dedicate 2 hours twice a week to group study, focusing on the core areas of concern (like Java Full Stack or ML practical logs).`;
+      } else if (prompt.includes("shortage") || prompt.includes("rules") || prompt.includes("below 75")) {
+        return `According to College Regulation Clause 4.2:\n\n* **75% Mandatory Attendance**: Every student is required to maintain a minimum of 75% in each subject to be eligible to sit for the Terminal Exams.\n* **Shortage Impact**: Falling below 75% means automatic debarment. However, students between 65%-74% with valid medical reasons can apply for condonation.\n* **Current Standing**: **${studentName}** is projected to achieve **${attendance}** final attendance. Please monitor this closely to avoid automatic system lockout alerts.`;
+      } else if (prompt.includes("grade") || prompt.includes("predict")) {
+        return `Based on current performance indicators, **${studentName}** is projected to secure a final grade of **${grade}**.\n\n**Analysis Breakdown:**\n* **Attendance Contribution**: Calculated out of 30 marks.\n* **Assessment Mastery**: CIA slider inputs are at active levels.\n* **Action Recommendation**: To elevate **${grade}** to the next grade tier, focus on maximizing your assignment scores and maintaining strict class presence!`;
+      } else {
+        return `Thank you for asking. Regarding **${studentName}** (Current prediction: **${attendance}** attendance, Projected Grade: **${grade}**):\n\nI highly recommend focusing on maintaining consistent laboratory logs and seeking immediate subject guidance from Dr. Sarah Conner. Please let me know if you have specific questions about academic criteria or regulation codes!`;
+      }
+    }
+
+    // Analytics Chart.js Initialization
+    let trendsChart = null;
+    let compChart = null;
+
+    function initAnalyticsCharts() {
+      // Destroy existing instance to prevent canvas reuse issue
+      if (trendsChart) trendsChart.destroy();
+      if (compChart) compChart.destroy();
+
+      const ctx1 = document.getElementById('weeklyTrendsChart').getContext('2d');
+      trendsChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+          datasets: [{
+            label: 'Overall CSE Department (%)',
+            data: [88, 92, 94, 91, 95, 92.4],
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderColor: '#3b82f6',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { min: 60, max: 100 }
+          }
+        }
+      });
+
+      const ctx2 = document.getElementById('subjectComparisonChart').getContext('2d');
+      compChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['CSE-801', 'CSE-802', 'CSE-803'],
+          datasets: [{
+            label: 'Average Presence (%)',
+            data: [94.2, 78.5, 91.8],
+            backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { min: 0, max: 100 }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

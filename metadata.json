@@ -1,0 +1,6 @@
+{
+  "name": "SmartAttend",
+  "description": "Smart Student Attendance Management System with Automated Report Generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
